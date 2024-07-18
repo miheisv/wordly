@@ -15,7 +15,6 @@ class Game:
                 letter = text[i].upper()
                 answer += f'__{letter}__'
                 mask.remove(text[i])
-                print(answer)
             elif text[i] in mask:
                 letter = text[i].upper()
                 answer += letter
