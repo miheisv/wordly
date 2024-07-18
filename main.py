@@ -53,6 +53,8 @@ def say_message(message):
     # идет игра
     if games.get(message.chat.id, False):
         answer = games.get(message.chat.id).get_answer(message.text)
+        print(answer)
+        print()
         bot.send_message(message.chat.id, answer, parse_mode='MarkdownV2')
 
 
