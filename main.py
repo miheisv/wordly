@@ -1,16 +1,16 @@
-import random
-import telebot
-from telebot.types import ReplyKeyboardMarkup, KeyboardButton
-from game import Game
+import json
 
-# from static_dev import TELEGRAM_TOKEN - для реальной работы
-# from static_dev import TELEGRAM_TOKEN  # DEV-режим
+import telebot
+from requests import get
+from telebot.types import KeyboardButton, ReplyKeyboardMarkup
+
+from game import Game
 
 
 TOKEN = '7341298603:AAEDIJwQrQad_Ld58oExcTJDGhvG_1eYOs0'
-URL = 'https://geek-jokes.sameerkumar.website/api?format=json'
+URL = 'https://127.0.0.1:8000'
 bot = telebot.TeleBot(TOKEN)
-
+games = dict()
 keyboards = dict()
 
 keyboards['start'] = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -22,9 +22,6 @@ keyboards['menu'].add(KeyboardButton('Игра'))
 keyboards['rules'] = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 keyboards['rules'].add(KeyboardButton('Понятно, начинаем!'))
 
-games = dict()
-words = ['парта', 'выдра', 'уголь', 'рыжик', 'пирог', 'рукав', 'порка', 'спина', 'длань']
-
 
 @bot.message_handler(commands=['help', 'start', 'menu'])
 def send_welcome(message):
@@ -32,25 +29,25 @@ def send_welcome(message):
 
 
 @bot.message_handler(regexp=r'меню')
-def say_message(message):
+def menu_message(message):
     bot.send_message(message.chat.id, 'Меню', reply_markup=keyboards['menu'])
 
 
 @bot.message_handler(regexp='игра')
-def say_message(message):
+def rule_message(message):
     bot.send_message(message.chat.id, 'Правила игры', reply_markup=keyboards['rules'])
 
 
 @bot.message_handler(regexp='понятно, начинаем!')
-def say_message(message):
-    # здесь создаем игру
-    games[message.chat.id] = Game(message.chat.id, 1, random.choice(words))
+def start_game(message):
+    games[message.chat.id] = Game(message.chat.id,
+                                  1,
+                                  json.loads(get(f'{URL}/random_word').content)["word"])
     bot.send_message(message.chat.id, 'Итак, слово загадано!')
 
 
 @bot.message_handler()
 def say_message(message):
-    # идет игра
     if games.get(message.chat.id, False):
         answer = games.get(message.chat.id).get_answer(message.text)
         bot.send_message(message.chat.id, answer, parse_mode='MarkdownV2')
