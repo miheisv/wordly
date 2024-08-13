@@ -5,10 +5,10 @@ import telebot
 from requests import get
 from telebot.types import KeyboardButton, ReplyKeyboardMarkup
 
-from game import Game
+from game.game import Game
 
 TOKEN = '7341298603:AAEDIJwQrQad_Ld58oExcTJDGhvG_1eYOs0'
-URL = 'https://127.0.0.1:8000'
+URL = 'http://127.0.0.1:8000'
 bot = telebot.TeleBot(TOKEN)
 games = dict()
 keyboards = dict()
@@ -42,8 +42,8 @@ def rule_message(message):
 def start_game(message):
     word_id = randint(1, json.loads(get(f'{URL}/words_count').content)["words_count"])
     games[message.chat.id] = Game(message.chat.id,
-                                  1,
-                                  json.loads(get(f'{URL}/word/{word_id}').content)["word"])
+                                1,
+                                json.loads(get(f'{URL}/word/{word_id}').content)["word"])
     bot.send_message(message.chat.id, 'Итак, слово загадано!')
 
 
